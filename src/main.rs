@@ -8,11 +8,11 @@ struct Neighbor<'a> {
 
 #[derive(Debug)]
 struct Result<'a> {
-    shortestDistance: i32,
-    previousVertex: Option<&'a str>,
+    shortest_distance: i32,
+    previous_vertex: Option<&'a str>,
 }
 
-fn createGraph<'a>() -> HashMap<&'static str, Vec<Neighbor<'a>>> {
+fn create_graph<'a>() -> HashMap<&'static str, Vec<Neighbor<'a>>> {
     let mut paths = HashMap::new();
     let mut neighbors = vec![];
     neighbors.push(Neighbor {
@@ -96,49 +96,49 @@ fn createGraph<'a>() -> HashMap<&'static str, Vec<Neighbor<'a>>> {
     return paths;
 }
 
-fn createResults<'a>() -> HashMap<&'static str, Box<Result<'a>>> {
+fn create_results<'a>() -> HashMap<&'static str, Box<Result<'a>>> {
     let mut results = HashMap::new();
 
     results.insert(
         "A",
         Box::new(Result {
-            shortestDistance: i32::MAX,
-            previousVertex: None,
+            shortest_distance: i32::MAX,
+            previous_vertex: None,
         }),
     );
     results.insert(
         "B",
         Box::new(Result {
-            shortestDistance: i32::MAX,
-            previousVertex: None,
+            shortest_distance: i32::MAX,
+            previous_vertex: None,
         }),
     );
     results.insert(
         "C",
         Box::new(Result {
-            shortestDistance: i32::MAX,
-            previousVertex: None,
+            shortest_distance: i32::MAX,
+            previous_vertex: None,
         }),
     );
     results.insert(
         "D",
         Box::new(Result {
-            shortestDistance: i32::MAX,
-            previousVertex: None,
+            shortest_distance: i32::MAX,
+            previous_vertex: None,
         }),
     );
     results.insert(
         "E",
         Box::new(Result {
-            shortestDistance: i32::MAX,
-            previousVertex: None,
+            shortest_distance: i32::MAX,
+            previous_vertex: None,
         }),
     );
 
     return results;
 }
 
-fn visitVertex<'a>(
+fn visit_vertex<'a>(
     vertex: &'a str,
     paths: &HashMap<&'a str, Vec<Neighbor<'a>>>,
     unvisited: &mut Vec<&str>,
@@ -149,10 +149,10 @@ fn visitVertex<'a>(
         return;
     }
 
-    let curDistance = results
+    let cur_distance = results
         .get(vertex)
         .expect(&*format!("No value found for vertex {}", vertex))
-        .shortestDistance;
+        .shortest_distance;
     let neighbors = paths
         .get(vertex)
         .expect(&*format!("No neighbors found for vertex {}", vertex));
@@ -162,13 +162,13 @@ fn visitVertex<'a>(
     } in neighbors.iter()
     {
         if unvisited.contains(&neighbor) {
-            let newDistance = curDistance + distance;
+            let new_distance = cur_distance + distance;
             let mut result = results
                 .get_mut(neighbor)
                 .expect(&*format!("No result found for vertex {}", neighbor));
-            if newDistance < result.shortestDistance {
-                result.shortestDistance = newDistance;
-                result.previousVertex = Some(vertex);
+            if new_distance < result.shortest_distance {
+                result.shortest_distance = new_distance;
+                result.previous_vertex = Some(vertex);
             }
         }
     }
@@ -177,35 +177,35 @@ fn visitVertex<'a>(
     unvisited.retain(|v| *v != vertex);
 }
 
-fn findPaths<'a>(
+fn find_paths<'a>(
     start: &'a str,
     paths: HashMap<&'a str, Vec<Neighbor<'a>>>,
 ) -> HashMap<&'a str, Box<Result<'a>>> {
     let mut unvisited = vec!["A", "B", "C", "D", "E"];
     let mut visited: Vec<&str> = vec![];
-    let mut results = createResults();
+    let mut results = create_results();
     let result = results
         .get_mut(start)
         .expect(&*format!("No result found for start {}", start));
-    result.shortestDistance = 0;
+    result.shortest_distance = 0;
 
-    visitVertex(start, &paths, &mut unvisited, &mut visited, &mut results);
+    visit_vertex(start, &paths, &mut unvisited, &mut visited, &mut results);
 
     while unvisited.len() > 0 {
-        let mut minDistance = i32::MAX;
-        let mut nextVertex: Option<&str> = None;
+        let mut min_distance = i32::MAX;
+        let mut next_vertex: Option<&str> = None;
         for v in unvisited.iter() {
             let result = results
                 .get(v)
                 .expect(&*format!("No result found for v {}", v));
-            if result.shortestDistance < minDistance {
-                minDistance = result.shortestDistance;
-                nextVertex = Some(v);
+            if result.shortest_distance < min_distance {
+                min_distance = result.shortest_distance;
+                next_vertex = Some(v);
             }
         }
 
-        match nextVertex {
-            Some(v) => visitVertex(v, &paths, &mut unvisited, &mut visited, &mut results),
+        match next_vertex {
+            Some(v) => visit_vertex(v, &paths, &mut unvisited, &mut visited, &mut results),
             None => return results,
         }
     }
@@ -214,15 +214,15 @@ fn findPaths<'a>(
 }
 
 fn main() {
-    let paths = createGraph();
+    let paths = create_graph();
 
-    let results = findPaths("A", paths);
+    let results = find_paths("A", paths);
 
     for v in ["A", "B", "C", "D", "E"].iter() {
         let result = results.get(v).expect("Not found");
         println!(
             "{}\t{}\t{:?}",
-            v, result.shortestDistance, result.previousVertex
+            v, result.shortest_distance, result.previous_vertex
         );
     }
 }
